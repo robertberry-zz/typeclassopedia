@@ -31,4 +31,24 @@ object FunctorExercises {
       case Pair(a1, a2) => Pair(f(a1), f(a2))
     }
   }
+
+  /** Difference is you need to apply the tupleFunctor for the type of the first element, whereas in Pair both elements
+    * are of that type. This also means that in Pair the functor maps over both contained values, whereas in tuple the
+    * functor maps over only the right value
+    */
+
+  /** Not sure what this funky datatype is supposed to be ... */
+  sealed trait ITree[A]
+  case class ILeaf[A](f: Int => A) extends ITree[A]
+  case class INode[A](trees: List[ITree[A]]) extends ITree[A]
+
+  implicit def iTreeFunctor = new Functor[ITree] {
+    def map[A, B](fa: ITree[A])(f: (A) => B): ITree[B] = {
+      def iter(node: ITree[A]): ITree[B] = node match {
+        case ILeaf(leaf) => ILeaf(f compose leaf)
+        case INode(trees) => INode(trees.map(iter))
+      }
+      iter(fa)
+    }
+  }
 }

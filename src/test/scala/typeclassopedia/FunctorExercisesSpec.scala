@@ -42,4 +42,27 @@ class FunctorExercisesSpec extends Specification {
       pair ∘ { _ / 5 } mustEqual Pair(2, 9)
     }
   }
+
+  "iTreeFunctor" should {
+    "implement map correctly" in {
+      def collectResults[A](tree: ITree[A], arg: Int): List[A] = tree match {
+        case ILeaf(f) => List(f(arg))
+        case INode(trees) => trees.flatMap(x => collectResults(x, arg))
+      }
+
+      val iTree = INode(List(
+        ILeaf({ _ * 2 }),
+        ILeaf({ _ + 1 }),
+        INode(List(
+          ILeaf({ _ - 10 })
+        ))
+      ))
+
+      collectResults(iTree, 1) ∘ { _.toString } mustEqual List(
+        "2",
+        "2",
+        "-9"
+      )
+    }
+  }
 }
