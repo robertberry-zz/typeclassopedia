@@ -3,6 +3,9 @@ package typeclassopedia
 import scalaz._
 
 object FunctorExercises {
+  /** Instances */
+  /** --------- */
+
   /** You have to use ({type l[D] = Either[C, D]})# here, as Either[C, _] is not considered by the compiler to be F[_].
     * This is because of an isomorphism between types and functions in Haskell. All functions in Haskell take one
     * parameter - multi-parameter functions are generalized under this as functions that take one parameter, then
@@ -49,6 +52,27 @@ object FunctorExercises {
         case INode(trees) => INode(trees.map(iter))
       }
       iter(fa)
+    }
+  }
+
+  type FunctionAInt[A] = Function1[A, Int]
+  /** This can't be a functor because fmap must accept a transformation from A => B. As FunctionAInt only accepts an A
+    * rather than enclosing or producing one, there's no sensible way to perform this mapping.
+    *
+    * i.e., the only way for fmap id == id is if fmap is essentially a no-op
+    */
+
+  /** The composition of two functors is a functor? */
+
+
+  /** Laws */
+  /** ---- */
+
+  case class Switch[A](a: A, switch: Boolean)
+
+  implicit def evilFunctor = new Functor[Switch] {
+    def map[A, B](fa: Switch[A])(f: (A) => B): Switch[B] = fa match {
+      case Switch(a, switch) => Switch(f(a), true)
     }
   }
 }

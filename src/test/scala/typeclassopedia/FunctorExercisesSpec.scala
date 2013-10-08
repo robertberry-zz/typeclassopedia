@@ -65,4 +65,19 @@ class FunctorExercisesSpec extends Specification {
       )
     }
   }
+
+  "evilFunctor" should {
+    val switch = Switch(5, false)
+
+    "satisfy the law of composition" in {
+      val f: Int => Int = { _ * 5 }
+      val g: Int => Int = { _ - 1 }
+
+      switch ∘ (f compose g) mustEqual ((switch ∘ g) ∘ f)
+    }
+
+    "not satisfy the law of identity" in {
+      switch ∘ identity mustNotEqual identity(switch)
+    }
+  }
 }
