@@ -8,13 +8,12 @@ import ApplicativeFunctorExercises._
 
 object ZipSeqApplicativeSpec extends Properties("ZipSeqFunctor") with FunctionIntIntHelper {
   property("point") = forAll { (f: Function[Int, Int], xs: List[Int]) =>
-    /* Currently fails compilation with error:
+    val seq = ZipStream(xs.toStream)
 
-    [error] ... could not find implicit value for parameter F0: scalaz.Apply[Seq]
-    [error]     ((ZipSeq(xs): Seq[Int] @@ ZipSeq) <*> f.point) == xs.map(f)
-
-    Curious ...
-     */
-    ((ZipSeq(xs): Seq[Int] @@ ZipSeq) <*> f.point) == xs.map(f)
+    /* For some reason this only seems to work if I call the applicative typeclass directly. If I try to use implicit
+     * resolution it seems to pick up some other typeclass for <*>, causing an infinite loop. Haven't been able to
+     * figure out what typeclass or why, though.
+      */
+    zipStreamApplicative.ap(seq)(zipStreamApplicative.point(f)) == xs.map(f)
   }
 }
