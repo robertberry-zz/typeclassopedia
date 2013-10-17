@@ -13,9 +13,7 @@ object ApplicativeFunctorExercises {
     } yield func(a)
   }
 
-  /** Has to be Seq for the point method below. In Haskell, this can just be a List due to laziness. Infinite Lists
-    * are not possible in Scala, but infinite Streams are. Both extend Seq.
-    */
+  /** Has to be Stream - Lists cannot be infinite in Scala. */
   sealed trait ZipStream
 
   def ZipStream[A](as: A): A @@ ZipStream = Tag[A, ZipStream](as)
