@@ -32,4 +32,20 @@ object MonoidalExercises {
 
     def map[A, B](fa: List[A])(f: A => B): List[B] = fa.map(f)
   }
+
+  implicit def monoidal2Applicative[F[_]](implicit monoidal: Monoidal[F]) = new Applicative[F] {
+    def point[A](a: => A): F[A] = monoidal.map(monoidal.unit)(_ => a)
+
+    def ap[A, B](fa: => F[A])(f: => F[(A) => B]): F[B] = monoidal.map(monoidal.**(f, fa)) {
+      case ((g, x)) => g(x)
+    }
+  }
+
+  implicit def applicative2Monoidal[F[_]](implicit applicative: Applicative[F]) = new Monoidal[F] {
+    def unit: F[Unit] = applicative.pure(Unit)
+
+    def **[A, B](fa: F[A], fb: F[B]): F[(A, B)] = applicative.ap(fb)(applicative.map(fa)(a => (b: B) => (a, b)))
+
+    def map[A, B](fa: F[A])(f: (A) => B): F[B] = applicative.map(fa)(f)
+  }
 }
