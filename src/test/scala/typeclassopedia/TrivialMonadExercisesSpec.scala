@@ -21,4 +21,8 @@ object TrivialMonadExercisesSpec extends Properties("Monad") {
     val W(j) = wj
     h(wi)(wj) == W(i + j)
   }
+
+  property("join") = forAll { (wrapped: W[Int]) =>
+    join(return_[W[Int]](wrapped)) == wrapped
+  }
 }
