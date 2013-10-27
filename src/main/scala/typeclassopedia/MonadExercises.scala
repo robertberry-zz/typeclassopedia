@@ -3,6 +3,15 @@ package typeclassopedia
 import scalaz.{Functor, Monad}
 
 object MonadExercises {
+  implicit object OptionMonad extends Monad[Option] {
+    def point[A](a: => A): Option[A] = Some(a)
+
+    def bind[A, B](fa: Option[A])(f: (A) => Option[B]): Option[B] = fa match {
+      case None => None
+      case Some(a) => f(a)
+    }
+  }
+
   implicit object ListMonad extends Monad[List] {
     def point[A](a: => A): List[A] = List(a)
 
@@ -44,5 +53,10 @@ object MonadExercises {
 
   def ap[M[_], A, B](f: M[A => B])(fa: M[A])(implicit m: Monad[M]): M[B] = {
     m.bind(f)(g => m.bind(fa)(a => m.point[B](g(a))))
+  }
+
+  def sequence[M[_], A](fas: List[M[A]])(implicit monad: Monad[M]): M[List[A]] = fas match {
+    case Nil => monad.point(Nil)
+    case fa :: rest => monad.bind(sequence(rest))(as => monad.bind(fa)(a => monad.point(a :: as)))
   }
 }

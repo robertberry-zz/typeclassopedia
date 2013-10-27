@@ -75,7 +75,17 @@ object FreeMonadSpec extends Properties("Monad") with FreeHelper {
   }
 }
 
-object MonadSpec extends Properties("Monad") with FunctionIntIntHelper {
+trait OptionHelper {
+  implicit def arbitraryOption[A: Arbitrary] = Arbitrary {
+    for {
+      isFull <- arbitrary[Boolean]
+    } yield if (isFull) for {
+      a <- arbitrary[A]
+    } yield Some(a) else None
+  }
+}
+
+object MonadSpec extends Properties("Monad") with FunctionIntIntHelper with OptionHelper {
   property(">>=") = forAll { (xs: List[Int]) =>
     def f(x: Int) = List.fill(x % 5)(x)
 
@@ -92,5 +102,13 @@ object MonadSpec extends Properties("Monad") with FunctionIntIntHelper {
 
   property("ap") = forAll { (xs: List[Int], fs: List[Int => Int]) =>
     ap(fs)(xs) == implicitly[Applicative[List]].ap(xs)(fs)
+  }
+
+  property("sequence") = forAll { (opts: List[Option[Int]]) =>
+    if (opts.forall(_.isDefined)) {
+      sequence(opts) == Some(opts.flatten)
+    } else {
+      sequence(opts) == None
+    }
   }
 }
