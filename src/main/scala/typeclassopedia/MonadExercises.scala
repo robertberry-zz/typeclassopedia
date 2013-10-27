@@ -59,4 +59,6 @@ object MonadExercises {
     case Nil => monad.point(Nil)
     case fa :: rest => monad.bind(sequence(rest))(as => monad.bind(fa)(a => monad.point(a :: as)))
   }
+
+  def replicateM[M[_], A](i: Int)(fa: M[A])(implicit monad: Monad[M]): M[List[A]] = sequence(List.fill(i)(fa))
 }

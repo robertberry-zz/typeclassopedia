@@ -111,4 +111,10 @@ object MonadSpec extends Properties("Monad") with FunctionIntIntHelper with Opti
       sequence(opts) == None
     }
   }
+
+  property("replicate") = forAll(Gen.chooseNum(1, 100)) { (n: Int) =>
+    forAll { (opt: Option[Int]) =>
+      replicateM(n)(opt) == (if (opt.isDefined) Some(List.fill(n)(opt).flatten) else None)
+    }
+  }
 }
