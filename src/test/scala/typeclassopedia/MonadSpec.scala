@@ -73,3 +73,19 @@ object FreeMonadSpec extends Properties("Monad") with FreeHelper {
     flatten(FreeMonad[List].bind(free)(f)) == flatten(free).map(f).flatMap(flatten)
   }
 }
+
+object MonadSpec extends Properties("Monad") with FunctionIntIntHelper {
+  property(">>=") = forAll { (xs: List[Int]) =>
+    def f(x: Int) = List.fill(x % 5)(x)
+
+    ListMonad.bind(xs)(f) == >>=(xs, f)
+  }
+
+  property("join") = forAll { (xs: List[List[Int]]) =>
+    ListMonad.join(xs) == join(xs)
+  }
+
+  property("fmap") = forAll { (xs: List[Int], f: Int => Int) =>
+    fmap(xs)(f) == ListMonad.map(xs)(f)
+  }
+}

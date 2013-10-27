@@ -34,4 +34,11 @@ object MonadExercises {
       case Node(fb) => Node(implicitly[Functor[F]].map(fb)(fc => bind(fc)(f)))
     }
   }
+
+  def >>=[F[_], A, B](fa: F[A], f: A => F[B])(implicit monad: Monad[F]): F[B] = monad.join(monad.map(fa)(f))
+
+  def join[F[_]: Monad, A](ffa: F[F[A]]): F[A] = >>=(ffa, identity[F[A]])
+
+  /** Would have used compose here but the compiler seems to be confused by it (i.e., monad.point[B].compose(f)) */
+  def fmap[F[_], A, B](fa: F[A])(f: A => B)(implicit monad: Monad[F]): F[B] = >>=(fa, (x: A) => monad.point[B](f(x)))
 }
