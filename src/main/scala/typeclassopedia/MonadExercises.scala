@@ -70,5 +70,9 @@ object MonadExercises {
   def forM[M[_], A, B](as: List[A])(f: A => M[B])(implicit monad: Monad[M]): M[List[B]] =
     sequence(fmap(as)(f))
 
+  /** No need to spec this as it's equivalent to >>= */
+  def =<<[F[_]: Monad, A, B](f: A => F[B], fa: F[A]) = >>=(fa, f)
 
+  def >=>[F[_], A, B, C](f: A => F[B])(g: B => F[C])(implicit monad: Monad[F]): A => F[C] =
+    (a: A) => monad.bind(f(a))(g)
 }

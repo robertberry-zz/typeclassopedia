@@ -127,4 +127,15 @@ object MonadSpec extends Properties("Monad") with FunctionIntIntHelper with Opti
 
     mapM(f)(xs) == (if (xs.forall(x => f(x).isDefined)) Some(xs) else None)
   }
+
+  implicit val arbitraryOptionIntF: Arbitrary[Int => Option[Int]] = Arbitrary {
+    for {
+      f <- arbitrary[Option[Int => Int]]
+    } yield f.map((Option.apply[Int] _).compose(_)).getOrElse((_: Int) => None)
+  }
+
+  property(">=>") = forAll { (f: Int => Option[Int], g: Int => Option[Int], i: Int) =>
+    val f_g = >=>(f)(g)
+    f(i).flatMap(g) == f_g(i)
+  }
 }
