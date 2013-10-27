@@ -5,6 +5,7 @@ import Prop._
 import MonadExercises._
 import org.scalacheck.Arbitrary._
 import org.scalacheck.util.Buildable
+import scalaz.Applicative
 
 object ListMonadSpec extends Properties("Monad") {
   property("point") = forAll { (i: Int) =>
@@ -87,5 +88,9 @@ object MonadSpec extends Properties("Monad") with FunctionIntIntHelper {
 
   property("fmap") = forAll { (xs: List[Int], f: Int => Int) =>
     fmap(xs)(f) == ListMonad.map(xs)(f)
+  }
+
+  property("ap") = forAll { (xs: List[Int], fs: List[Int => Int]) =>
+    ap(fs)(xs) == implicitly[Applicative[List]].ap(xs)(fs)
   }
 }

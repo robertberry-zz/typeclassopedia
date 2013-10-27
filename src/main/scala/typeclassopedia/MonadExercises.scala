@@ -41,4 +41,8 @@ object MonadExercises {
 
   /** Would have used compose here but the compiler seems to be confused by it (i.e., monad.point[B].compose(f)) */
   def fmap[F[_], A, B](fa: F[A])(f: A => B)(implicit monad: Monad[F]): F[B] = >>=(fa, (x: A) => monad.point[B](f(x)))
+
+  def ap[M[_], A, B](f: M[A => B])(fa: M[A])(implicit m: Monad[M]): M[B] = {
+    m.bind(f)(g => m.bind(fa)(a => m.point[B](g(a))))
+  }
 }
