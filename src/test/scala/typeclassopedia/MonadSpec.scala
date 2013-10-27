@@ -117,4 +117,8 @@ object MonadSpec extends Properties("Monad") with FunctionIntIntHelper with Opti
       replicateM(n)(opt) == (if (opt.isDefined) Some(List.fill(n)(opt).flatten) else None)
     }
   }
+
+  property("when") = forAll { (cond: Boolean, units: List[Unit]) =>
+    when(cond)(units) == (if (cond) units else ListMonad.point(Unit): List[Unit])
+  }
 }

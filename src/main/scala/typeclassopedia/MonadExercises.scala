@@ -61,4 +61,6 @@ object MonadExercises {
   }
 
   def replicateM[M[_], A](i: Int)(fa: M[A])(implicit monad: Monad[M]): M[List[A]] = sequence(List.fill(i)(fa))
+
+  def when[M[_]: Monad](cond: => Boolean)(fa: => M[Unit]): M[Unit] = if (cond) fa else implicitly[Monad[M]].point(Unit)
 }
