@@ -121,4 +121,10 @@ object MonadSpec extends Properties("Monad") with FunctionIntIntHelper with Opti
   property("when") = forAll { (cond: Boolean, units: List[Unit]) =>
     when(cond)(units) == (if (cond) units else ListMonad.point(Unit): List[Unit])
   }
+
+  property("mapM") = forAll { (xs: List[Int]) =>
+    def f(i: Int) = if (i % 5 == 1) None else Some(i)
+
+    mapM(f)(xs) == (if (xs.forall(x => f(x).isDefined)) Some(xs) else None)
+  }
 }
